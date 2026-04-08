@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Drag Papers ❤️</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Short+Stack&family=Homemade+Apple&display=swap">
+  <link rel="stylesheet" href="./style.css">
+  <style>
+    body {
+      background: url("bg.jpeg") center/cover fixed no-repeat;
+      margin: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .music-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 16px;
+      z-index: 9999;
+      border: none;
+      padding: 10px 14px;
+      border-radius: 999px;
+      font-size: 14px;
+      backdrop-filter: blur(6px);
+      background: rgba(255,255,255,0.7);
+      box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      cursor: pointer;
+      user-select: none;
+    }
+    .music-btn[aria-pressed="true"] { font-weight: 700; }
+    .paper { touch-action: none; }
+
+    /* Make images fit nicely in both orientations */
+    .paper.image img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      max-height: 80vh; /* avoid overflow in landscape */
+      object-fit: contain;
+      border-radius: 10px;
+    }
+
+    .paper.heart .heart-img {
+      width: 100%;
+      height: auto;
+      display: block;
+      pointer-events: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      object-fit: contain;
+      max-height: 80vh;
+    }
+  </style>
+</head>
+<body>
+  <!-- Music -->
+  <audio id="bg-music" preload="auto" loop autoplay muted playsinline>
+    <source src="birthdaymusic.mp3" type="audio/mpeg" />
+  </audio>
+  <button id="music-toggle" class="music-btn" aria-pressed="false" title="Toggle music">▶️ Play music</button>
+
+  <!-- Heart -->
+  <div class="paper heart">
+    <img class="heart-img" src="heart.webp" alt="Heart" loading="lazy" />
+  </div>
+
+  <!-- Image papers with captions -->
+  <div class="paper image">
+    <p>Happy Birthday 🎉</p>
+    <p>Chandrika — she is my friend for short days only but best 😜</p>
+    <img src="1jpeg" alt="Photo 1" />
+  </div>
+
+  <div class="paper image">
+    <p>Best friends are like Wi-Fi… you don’t see them, but life crashes without them 😄</p>
+    <img src="2.jpeg" alt="Photo 2" />
+  </div>
+
+  <div class="paper image">
+    <p>Another year older? Nah… just leveling up like a pro 🎮</p>
+    <img src="3.jpeg" alt="Photo 3" />
+  </div>
+
+  <div class="paper image">
+    <p>You’re the Wi-Fi to my router 📶</p>
+    <p>…life’s boring without you!</p>
+    <img src="4.jpeg" alt="Photo 4" />
+  </div>
+
+  <div class="paper image">
+    <p>“Age is merely the number of years</p>
+    <p>the world has been enjoying you.” 😎</p>
+    <img src="5.jpeg" alt="Photo 5" />
+  </div>
+
+  <div class="paper image">
+    <p>Thanks for being my</p>
+    <p>emergency contact for dumb ideas 😂</p>
+    <img src="6.jpeg" alt="Photo 6" />
+  </div>
+
+  <div class="paper image">
+    <p>You’re basically my daily dose of chaos and entertainment 😂</p>
+    <img src="7.jpeg" alt="Photo 7" />
+  </div>
+
+  <div class="paper image">
+    <p>May your birthday come with good vibes and better cake 😌🎂</p>
+    <img src="8.jpeg" alt="Photo 8" />
+  </div>
+
+  <div class="paper image">
+    <p>Birthday rule: you get to act extra today… no questions asked 😂🎂</p>
+    <img src="9.jpeg" alt="Photo 9" />
+  </div>
+
+  <!-- Extra papers -->
+  <div class="paper red">
+    <p class="p1">Here’s to more adventures,</p>
+    <p class="p2">more laughs, and less adulting 🥳</p>
+  </div>
+
+  <div class="paper">
+    <p class="p1">You’re not old…</p>
+    <p class="p1">You’re just vintage 😏</p>
+  </div>
+
+  <div class="paper">
+    <p class="p1">Drag the papers to move!</p>
+  </div>
+
+  <script>
+    const audio = document.getElementById('bg-music');
+    const btn = document.getElementById('music-toggle');
+
+    function fadeIn(audioEl, target = 0.5, ms = 1200) {
+      audioEl.volume = 0;
+      const steps = Math.max(1, Math.floor(ms / 50));
+      let i = 0;
+      const tick = () => {
+        i++;
+        audioEl.volume = Math.min(target, (i / steps) * target);
+        if (i < steps && !audioEl.paused) requestAnimationFrame(tick);
+      };
+      requestAnimationFrame(tick);
+    }
+
+    async function enableAudio() {
+      try {
+        audio.muted = false;
+        await audio.play();
+        fadeIn(audio, 0.5);
+        btn.textContent = '⏸️ Pause music';
+        btn.setAttribute('aria-pressed', 'true');
+      } catch (err) {
+        console.warn('Autoplay blocked until interaction.');
+      }
+    }
+
+    // Try unmuting after page load
+    window.addEventListener('load', () => {
+      setTimeout(() => enableAudio(), 300);
+    });
+
+    // Also ensure it plays on first touch/click if blocked
+    const userStart = () => {
+      enableAudio();
+      window.removeEventListener('pointerdown', userStart);
+      window.removeEventListener('touchstart', userStart);
+      window.removeEventListener('keydown', userStart);
+    };
+    window.addEventListener('pointerdown', userStart, { once: true });
+    window.addEventListener('touchstart', userStart, { once: true });
+    window.addEventListener('keydown', userStart, { once: true });
+
+    btn.addEventListener('click', async () => {
+      if (audio.paused) {
+        await enableAudio();
+      } else {
+        audio.pause();
+        btn.textContent = '▶️ Play music';
+        btn.setAttribute('aria-pressed', 'false');
+      }
+    });
+
+    // Dragging for mobile + desktop
+    let active = null, offsetX = 0, offsetY = 0;
+    function startDrag(e) {
+      active = e.currentTarget;
+      const touch = e.touches ? e.touches[0] : e;
+      const rect = active.getBoundingClientRect();
+      offsetX = touch.clientX - rect.left;
+      offsetY = touch.clientY - rect.top;
+      if (getComputedStyle(active).position !== 'absolute') {
+        active.style.position = 'absolute';
+        active.style.left = rect.left + window.scrollX + 'px';
+        active.style.top = rect.top + window.scrollY + 'px';
+      }
+      document.addEventListener('mousemove', drag);
+      document.addEventListener('touchmove', drag, { passive: false });
+      document.addEventListener('mouseup', endDrag);
+      document.addEventListener('touchend', endDrag);
+    }
+    function drag(e) {
+      if (!active) return;
+      e.preventDefault();
+      const touch = e.touches ? e.touches[0] : e;
+      active.style.left = (touch.clientX - offsetX + window.scrollX) + 'px';
+      active.style.top = (touch.clientY - offsetY + window.scrollY) + 'px';
+      active.style.zIndex = Date.now();
+    }
+    function endDrag() {
+      document.removeEventListener('mousemove', drag);
+      document.removeEventListener('touchmove', drag);
+      document.removeEventListener('mouseup', endDrag);
+      document.removeEventListener('touchend', endDrag);
+      active = null;
+    }
+    document.querySelectorAll('.paper').forEach(p => {
+      p.addEventListener('mousedown', startDrag);
+      p.addEventListener('touchstart', startDrag);
+    });
+  </script>
+</body>
+</html>
